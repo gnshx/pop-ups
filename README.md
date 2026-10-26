@@ -101,26 +101,48 @@ cd pop-ups
 npm install
 ```
 
-### Running the App
+### ⚡ Running the 2 Versions
 
-#### Option A: One-Click Desktop Launcher
-Run the helper script directly:
+Pop-ups includes two optimized engine profiles tailored for your machine's hardware:
+
+| Feature | ⚡ High-End / Full GPU Version | 🍃 Low-End / Eco Version |
+|---|---|---|
+| **Target Hardware** | Modern PCs, discrete GPUs (NVIDIA/AMD), high refresh rate screens | Low-end laptops, budget CPUs, integrated Intel/AMD graphics, battery saver |
+| **Target FPS** | **60 FPS** unthrottled during action, 24 FPS idle | **8–30 FPS** adaptive (8 FPS idle, 4 FPS sleep) |
+| **Canvas Backing Buffer** | **Native Retina Hi-DPI (1.5x–2.0x)** | **Clamped 1.0x DPI** (75% less pixel memory) |
+| **Glow & Shadows** | Canvas `shadowBlur` & neon gradients enabled | **Shadows disabled** (eliminates software rasterizer lag) |
+| **Particles** | Rich 25-particle physics & continuous notes | Capped to 3 active particles max |
+| **Sleep Mode Timer** | 20 seconds inactivity | 10 seconds inactivity (drops to 4 FPS quickly) |
+| **CPU Scheduling** | Normal priority | Lower priority (`os.nice(10)`) |
+
+---
+
+#### ⚡ 1. High CPU & GPU Version (Full Visual Fidelity)
+For maximum aesthetic quality, crisp Retina supersampling, and 60 FPS:
 ```bash
-./start_pet.sh
+./run_high.sh
+# or:
+./run_desktop.sh --high
 ```
 
-#### Option B: Manual Launch
-1. Start the Vite development server:
-   ```bash
-   npm run dev
-   ```
-2. In a second terminal, launch the desktop overlay:
-   ```bash
-   python3 desktop_overlay.py http://127.0.0.1:5173
-   ```
+#### 🍃 2. Low-End Version (Ultra-Low CPU & Battery Saver)
+For older laptops or minimal background resource usage:
+```bash
+./run_low.sh
+# or:
+./run_desktop.sh --low
+```
 
-#### Option C: Browser Preview
-Open `http://localhost:5173` in any modern web browser.
+#### 🔄 In-App Live Switching
+Double-click the desktop pet (or press <kbd>S</kbd>) to open the **Companion Settings** popup. Under **Device Performance Mode**, tap **High-End (GPU)** or **Low-End (Eco)** to instantly switch between modes live without restarting!
+
+#### 🛠️ Option C: Developer Mode (Live Vite HMR)
+```bash
+./run_desktop.sh --dev
+```
+
+#### 🌐 Option D: Browser Preview
+Open `http://localhost:5173` in any web browser.
 
 ---
 

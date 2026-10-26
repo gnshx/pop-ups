@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
-import type { CharacterConfig, ExpressionType, Particle } from '../types/pet';
+import type { CharacterConfig, ExpressionType, Particle, PerformanceProfile } from '../types/pet';
 import { PendulumPhysics } from '../services/physicsEngine';
 import { audioEngine } from '../services/audioEngine';
 
@@ -10,6 +10,7 @@ interface PetCanvasProps {
   hangingEnabled: boolean;
   anchorX: number;
   isPopupOpen?: boolean;
+  performanceProfile?: PerformanceProfile;
   onAnchorXChange?: (newX: number) => void;
   onPetClick?: () => void;
   onPetDoubleClick?: (x: number, y: number) => void;
@@ -23,6 +24,7 @@ export const PetCanvas: React.FC<PetCanvasProps> = ({
   hangingEnabled,
   anchorX,
   isPopupOpen,
+  performanceProfile = 'high',
   onAnchorXChange,
   onPetClick,
   onPetDoubleClick,
@@ -79,8 +81,13 @@ export const PetCanvas: React.FC<PetCanvasProps> = ({
     setCurrentExpression(character.currentExpression);
   }, [character.currentExpression]);
 
-  // Spawn visual particles
+  // Spawn visual particles (adaptive to performanceProfile)
   const spawnParticle = useCallback((type: 'note' | 'heart' | 'zzz' | 'sparkle', x: number, y: number, color?: string) => {
+    const isLow = performanceProfile === 'low';
+    // On low profile, cap active particles to 3 max to save memory and CPU
+    if (isLow && particlesRef.current.length >= 3) {
+      return;
+    }
     const p: Particle = {
       id: nextParticleIdRef.current++,
       x: x + (Math.random() * 20 - 10),
@@ -91,20 +98,24 @@ export const PetCanvas: React.FC<PetCanvasProps> = ({
       color: color || '#f43f5e',
       alpha: 1,
       scale: Math.random() * 0.4 + 0.8,
-      rotation: (Math.random() - 0.5) * 0.5,
+      rotation: isLow ? 0 : (Math.random() - 0.5) * 0.5,
       life: 0,
-      maxLife: type === 'zzz' ? 120 : 70,
+      maxLife: type === 'zzz' ? (isLow ? 50 : 120) : (isLow ? 35 : 70),
     };
     particlesRef.current.push(p);
-  }, []);
+  }, [performanceProfile]);
 
-  const dprRef = useRef<number>(typeof window !== 'undefined' ? Math.max(1, window.devicePixelRatio || 1) : 1);
+  const dprRef = useRef<number>(typeof window !== 'undefined' ? (performanceProfile === 'low' ? 1 : Math.max(1, window.devicePixelRatio || 1)) : 1);
 
-  // Handle Window Resizing with High-DPI Retina Support
+  // Handle Window Resizing with High-DPI Retina Support (adaptive to performanceProfile)
   useEffect(() => {
     const handleResize = () => {
       if (canvasRef.current) {
-        const dpr = Math.max(1, window.devicePixelRatio || 1);
+        // High profile: full native Hi-DPI (Retina 1.5x-2x supersampling)
+        // Low profile: locked to 1.0x (slashes canvas buffer by up to 75% on Retina!)
+        const dpr = performanceProfile === 'low'
+          ? 1.0
+          : Math.max(1, window.devicePixelRatio || 1);
         dprRef.current = dpr;
         const w = window.innerWidth;
         const h = window.innerHeight;
@@ -120,9 +131,9 @@ export const PetCanvas: React.FC<PetCanvasProps> = ({
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [anchorX]);
+  }, [anchorX, performanceProfile]);
 
-  // Main Render & Physics Loop — Adaptive FPS Scheduler
+  // Main Render & Physics Loop — Adaptive FPS Scheduler (Profile-Aware)
   useEffect(() => {
     // Two handles: one for rAF (high-fps), one for setTimeout (low-fps)
     let rafHandle: number | null = null;
@@ -136,13 +147,9 @@ export const PetCanvas: React.FC<PetCanvasProps> = ({
     };
 
     /**
-     * Compute the target rendering FPS based on current activity level.
-     *
-     * Idle desktop pet sitting still: ~10 fps  → ~83% less work than 60 fps
-     * Sleeping (zzz mode):             ~6 fps  → ~90% less work than 60 fps
-     * Pendulum swinging / dancing:    ~30 fps  → ~50% less work than 60 fps
-     * User actively dragging:         ~60 fps  → full speed for smoothness
-     * Hidden (pin-only mode):          ~4 fps  → nearly zero overhead
+     * Compute target rendering FPS based on performanceProfile & activity.
+     * High: 60 FPS unthrottled during action, 24 FPS idle.
+     * Low:  30 FPS capped during action, 8 FPS idle, 4 FPS sleeping (extreme power save).
      */
     const getTargetFPS = (
       isDragging: boolean,
@@ -151,21 +158,33 @@ export const PetCanvas: React.FC<PetCanvasProps> = ({
       hasParticles: boolean,
       inactivitySecs: number,
     ): number => {
+      if (performanceProfile === 'low') {
+        // --- Low-End / Eco Mode: minimal CPU/GPU consumption ---
+        if (isDragging)              return 30; // responsive drag
+        if (isDancing)               return 20; // light beat bob
+        if (angleAbs > 0.008)        return 18; // swinging
+        if (hasParticles)            return 14;
+        if (inactivitySecs < 3)      return 15; // interactive
+        if (isBlinkingRef.current)   return 10;
+        if (currentExpression === 'sleepy') return 4; // deep power-saver sleep
+        return 8; // idle rest
+      }
+
+      // --- High-End / Ultra Mode: full visual glory at 60 FPS ---
       if (isDragging)              return 60; // silky-smooth drag
-      if (isDancing)               return 30; // beat-synced bounce
-      if (angleAbs > 0.008)        return 30; // pendulum still swinging
-      if (hasParticles)            return 20; // floating hearts / notes
-      if (inactivitySecs < 3)      return 20; // just interacted
-      if (isBlinkingRef.current)   return 15; // mid-blink frame
-      if (currentExpression === 'sleepy') return 6; // deep sleep — barely anything moves
-      return 10; // default idle
+      if (isDancing)               return 60; // 60fps music dance
+      if (angleAbs > 0.008)        return 60; // 60fps pendulum
+      if (hasParticles)            return 30; // rich particles
+      if (inactivitySecs < 4)      return 30; // responsive
+      if (isBlinkingRef.current)   return 20;
+      if (currentExpression === 'sleepy') return 12;
+      return 24; // smooth idle
     };
 
     /**
      * Schedule the next frame.
      * ≥55 fps  → requestAnimationFrame (vsync-locked, zero jitter).
-     * <55 fps  → setTimeout then rAF so the browser thread can genuinely
-     *            sleep for the delay interval instead of spinning on vsync.
+     * <55 fps  → setTimeout then rAF so browser thread genuinely sleeps.
      */
     const scheduleNext = (fps: number) => {
       cancelSchedule();
@@ -198,15 +217,15 @@ export const PetCanvas: React.FC<PetCanvasProps> = ({
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.scale(dpr, dpr);
 
-      // Enable high-quality anti-aliased image rendering
+      // Image smoothing: High uses high quality; Low uses fast bilinear
       ctx.imageSmoothingEnabled = true;
-      ctx.imageSmoothingQuality = 'high';
+      ctx.imageSmoothingQuality = performanceProfile === 'low' ? 'low' : 'high';
 
       if (!petEnabled) {
         // Draw discrete top screen pin so user can re-open settings
         drawHiddenPin(ctx, physicsRef.current.state.anchorX);
         ctx.restore();
-        scheduleNext(4); // ultra-low rate — pin barely changes
+        scheduleNext(performanceProfile === 'low' ? 2 : 6);
         return;
       }
 
@@ -228,20 +247,21 @@ export const PetCanvas: React.FC<PetCanvasProps> = ({
       breatheTimeRef.current += dt;
       inactivityTimerRef.current += dt;
 
-      // Handle Sleep Mode after 18 seconds of inactivity
-      if (inactivityTimerRef.current > 18 && currentExpression === 'idle' && !physics.state.isDragging) {
+      // Handle Sleep Mode: 10s on low profile (sleep sooner to save CPU), 20s on high
+      const sleepThreshold = performanceProfile === 'low' ? 10 : 20;
+      if (inactivityTimerRef.current > sleepThreshold && currentExpression === 'idle' && !physics.state.isDragging) {
         setCurrentExpression('sleepy');
         onExpressionChange?.('sleepy');
         audioEngine.playChime('sleep');
       }
 
       // Spawn Zzz particles when sleeping
-      if (currentExpression === 'sleepy' && Math.random() < 0.03) {
+      if (currentExpression === 'sleepy' && Math.random() < (performanceProfile === 'low' ? 0.015 : 0.03)) {
         spawnParticle('zzz', physics.state.bobX + 25, physics.state.bobY - 40, '#a5b4fc');
       }
 
       // Spawn music note particles when dancing
-      if (isDancing && Math.random() < 0.06 + beatIntensity * 0.1) {
+      if (isDancing && Math.random() < (performanceProfile === 'low' ? 0.03 : 0.06 + beatIntensity * 0.1)) {
         const noteColors = ['#f472b6', '#38bdf8', '#c084fc', '#fbbf24'];
         const chosenColor = noteColors[Math.floor(Math.random() * noteColors.length)];
         spawnParticle('note', physics.state.bobX + (Math.random() * 60 - 30), physics.state.bobY - 30, chosenColor);
@@ -288,7 +308,10 @@ export const PetCanvas: React.FC<PetCanvasProps> = ({
       // Draw character (Reze & Denji or procedural vector chibi)
       if (charImageRef.current && charImageRef.current.complete && character.imageUrl) {
         const img = charImageRef.current;
-        const breathScale = 1 + Math.sin(breatheTimeRef.current * 2.2) * 0.015;
+        // In low mode when idle, skip breath scale to avoid redraw recalculations
+        const breathScale = performanceProfile === 'low' && Math.abs(physics.state.angle) < 0.002 && !isDancing
+          ? 1.0
+          : 1 + Math.sin(breatheTimeRef.current * 2.2) * 0.015;
         const w = 180 * breathScale;
         const h = 180 * breathScale;
         ctx.drawImage(img, -w / 2, -22 + beatBob, w, h);
@@ -329,9 +352,9 @@ export const PetCanvas: React.FC<PetCanvasProps> = ({
       scheduleNext(targetFPS);
     };
 
-    scheduleNext(20); // start at 20fps; ramps automatically
+    scheduleNext(performanceProfile === 'low' ? 15 : 30);
     return () => cancelSchedule();
-  }, [character, petEnabled, musicEnabled, hangingEnabled, currentExpression, mousePos, spawnParticle, onExpressionChange]);
+  }, [character, petEnabled, musicEnabled, hangingEnabled, currentExpression, mousePos, spawnParticle, onExpressionChange, performanceProfile]);
 
   // Update and render floating particles (Notes, Hearts, Zzz, Sparkles)
   const updateAndDrawParticles = (ctx: CanvasRenderingContext2D, _dt: number) => {
@@ -410,28 +433,38 @@ export const PetCanvas: React.FC<PetCanvasProps> = ({
     ctx.lineWidth = char.threadType === 'golden_wire' ? 2 : 2.5;
 
     if (char.threadType === 'golden_wire') {
-      const grad = ctx.createLinearGradient(x0, y0, x1, y1);
-      grad.addColorStop(0, '#fef08a');
-      grad.addColorStop(0.5, '#eab308');
-      grad.addColorStop(1, '#ca8a04');
-      ctx.strokeStyle = grad;
-      ctx.shadowColor = 'rgba(234, 179, 8, 0.4)';
-      ctx.shadowBlur = 4;
+      if (performanceProfile === 'low') {
+        ctx.strokeStyle = '#eab308';
+      } else {
+        const grad = ctx.createLinearGradient(x0, y0, x1, y1);
+        grad.addColorStop(0, '#fef08a');
+        grad.addColorStop(0.5, '#eab308');
+        grad.addColorStop(1, '#ca8a04');
+        ctx.strokeStyle = grad;
+        ctx.shadowColor = 'rgba(234, 179, 8, 0.4)';
+        ctx.shadowBlur = 4;
+      }
     } else if (char.threadType === 'neon_cyan') {
       ctx.strokeStyle = '#06b6d4';
-      ctx.shadowColor = '#06b6d4';
-      ctx.shadowBlur = 8;
+      if (performanceProfile === 'high') {
+        ctx.shadowColor = '#06b6d4';
+        ctx.shadowBlur = 8;
+      }
     } else if (char.threadType === 'twilight_purple') {
       ctx.strokeStyle = '#c084fc';
-      ctx.shadowColor = 'rgba(192, 132, 252, 0.5)';
-      ctx.shadowBlur = 6;
+      if (performanceProfile === 'high') {
+        ctx.shadowColor = 'rgba(192, 132, 252, 0.5)';
+        ctx.shadowBlur = 6;
+      }
     } else if (char.threadType === 'invisible') {
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
     } else {
       // Crimson Silk (default)
       ctx.strokeStyle = char.threadColor || '#f43f5e';
-      ctx.shadowColor = 'rgba(244, 63, 94, 0.3)';
-      ctx.shadowBlur = 3;
+      if (performanceProfile === 'high') {
+        ctx.shadowColor = 'rgba(244, 63, 94, 0.3)';
+        ctx.shadowBlur = 3;
+      }
     }
 
     ctx.stroke();

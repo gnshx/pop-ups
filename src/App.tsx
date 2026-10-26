@@ -5,11 +5,37 @@ import { CharacterStudio } from './components/CharacterStudio';
 import { MusicPlayerDock } from './components/MusicPlayerDock';
 import { DesktopEnvironment } from './components/DesktopEnvironment';
 import { DEFAULT_CHARACTERS } from './constants/presets';
-import type { CharacterConfig, ExpressionType } from './types/pet';
+import type { CharacterConfig, ExpressionType, PerformanceProfile } from './types/pet';
 import { audioEngine } from './services/audioEngine';
 import { nativeBridge, type HitboxRect } from './services/nativeBridge';
 
 export const App: React.FC = () => {
+  // Performance Profile: 'high' (60 FPS, Retina Hi-DPI, glows) vs 'low' (8-30 FPS, 1x DPI, no shadows, low CPU)
+  const [performanceProfile, setPerformanceProfile] = useState<PerformanceProfile>(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const urlParam = params.get('profile') || params.get('mode');
+      if (urlParam === 'low' || urlParam === 'eco') return 'low';
+      if (urlParam === 'high' || urlParam === 'ultra') return 'high';
+    }
+    try {
+      const saved = localStorage.getItem('threadpet_performance_profile');
+      if (saved === 'low' || saved === 'high') return saved;
+    } catch {
+      // Fallback
+    }
+    return 'high';
+  });
+
+  const handlePerformanceProfileChange = useCallback((profile: PerformanceProfile) => {
+    setPerformanceProfile(profile);
+    try {
+      localStorage.setItem('threadpet_performance_profile', profile);
+    } catch {
+      // Ignore
+    }
+  }, []);
+
   // Load Character from localStorage or default to Gojo Satoru
   const [character, setCharacter] = useState<CharacterConfig>(() => {
     try {
@@ -223,6 +249,7 @@ export const App: React.FC = () => {
         hangingEnabled={hangingEnabled}
         anchorX={anchorX}
         isPopupOpen={isPopupOpen}
+        performanceProfile={performanceProfile}
         onAnchorXChange={handleAnchorXChange}
         onPetClick={handlePetClick}
         onPetDoubleClick={handlePetDoubleClick}
@@ -274,6 +301,8 @@ export const App: React.FC = () => {
         onOpenFullStudio={() => setIsStudioOpen(true)}
         currentTrackTitle={currentTrackTitle}
         onTrackTitleChange={setCurrentTrackTitle}
+        performanceProfile={performanceProfile}
+        onPerformanceProfileChange={handlePerformanceProfileChange}
       />
 
       {/* 4. AI Character Studio Modal (Optional full creator) */}

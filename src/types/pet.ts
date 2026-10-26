@@ -1,5 +1,7 @@
 export type ExpressionType = 'idle' | 'happy' | 'sleepy' | 'surprised' | 'dancing' | 'dizzy';
 
+export type PerformanceProfile = 'high' | 'low';
+
 export type HairStyle = 'twintails' | 'bob' | 'flowing' | 'short' | 'curly';
 export type EyeStyle = 'anime_round' | 'cat_slit' | 'sparkle' | 'droopy';
 export type AccessoryType = 'cat_ears' | 'bunny_ears' | 'halo' | 'headset' | 'ribbon' | 'glasses' | 'none';

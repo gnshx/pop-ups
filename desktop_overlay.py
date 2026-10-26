@@ -77,8 +77,15 @@ class StaticFileServer:
 # ---------------------------------------------------------------------------
 
 class DesktopPetOverlay:
-    def __init__(self, target_url: str = "http://127.0.0.1:5173"):
+    def __init__(self, target_url: str = "http://127.0.0.1:5173", profile: str = "high"):
+        self.profile = profile.lower()
         self._static_server: StaticFileServer | None = None
+
+        if self.profile == "low":
+            try:
+                os.nice(10)  # Lower Linux CPU scheduling priority on low-end devices
+            except Exception:
+                pass
 
         # --- Determine URL ---------------------------------------------------
         # If no explicit URL/--dev is requested and dist/ exists, self-host it.
@@ -90,11 +97,17 @@ class DesktopPetOverlay:
                 dist_dir = os.path.join(script_dir, "dist")
                 self._static_server = StaticFileServer(dist_dir, port=5174)
                 target_url = self._static_server.start()
-                print("[DesktopPetOverlay] ✓ Using built static files (low-CPU mode)")
+                print("[DesktopPetOverlay] ✓ Using built static files")
             else:
                 target_url = "http://127.0.0.1:5173"
                 print("[DesktopPetOverlay] dist/ not found — falling back to Vite dev server")
                 print("  Run 'npm run build' first for the lightest possible CPU footprint.")
+
+        # Append ?profile=low or ?profile=high so React loads with the correct version
+        sep = "&" if "?" in target_url else "?"
+        target_url = f"{target_url}{sep}profile={self.profile}"
+        mode_desc = "Low-End / Eco (8-30 FPS, 1x DPI, Shadows Disabled)" if self.profile == "low" else "High-End / GPU (60 FPS, Retina, Glows & Full Particles)"
+        print(f"[DesktopPetOverlay] Mode: {self.profile.upper()} → {mode_desc}")
 
         # --- GTK Window ------------------------------------------------------
         self.window = Gtk.Window(type=Gtk.WindowType.TOPLEVEL)
@@ -314,18 +327,26 @@ class DesktopPetOverlay:
 
 if __name__ == "__main__":
     # Parse args:
-    #   --dev          → force Vite dev server at :5173
-    #   <url>          → explicit URL
-    #   (nothing)      → auto-detect (prefer dist/)
+    #   --high / --ultra → High CPU & GPU version (60 FPS, Retina, Glows, Particles)
+    #   --low  / --eco   → Low-End version (8-30 FPS, 1x DPI, No Shadows, Battery Saver)
+    #   --dev            → force Vite dev server at :5173
+    #   <url>            → explicit URL
+    #   (nothing)        → auto-detect (prefer dist/ with high profile)
     args = sys.argv[1:]
+
+    profile = "high"
+    if any(flag in args for flag in ("--low", "--eco", "-low", "low", "eco")):
+        profile = "low"
+    elif any(flag in args for flag in ("--high", "--ultra", "-high", "high", "ultra")):
+        profile = "high"
 
     if "--dev" in args:
         url = "http://127.0.0.1:5173"
         print("[DesktopPetOverlay] --dev flag: using Vite dev server")
-    elif args and not args[0].startswith("--"):
+    elif args and not args[0].startswith("-"):
         url = args[0]
     else:
         url = "__auto__"  # sentinel → auto-serve dist/ if available
 
-    app = DesktopPetOverlay(target_url=url)
+    app = DesktopPetOverlay(target_url=url, profile=profile)
     app.run()

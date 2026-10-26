@@ -13,8 +13,11 @@ import {
   Upload,
   Wand2,
   Check,
+  Zap,
+  Leaf,
+  Cpu,
 } from 'lucide-react';
-import type { CharacterConfig } from '../types/pet';
+import type { CharacterConfig, PerformanceProfile } from '../types/pet';
 import { DEFAULT_CHARACTERS } from '../constants/presets';
 import { audioEngine } from '../services/audioEngine';
 import { calculatePopupPosition } from '../utils/popupPosition';
@@ -37,6 +40,8 @@ interface CompanionSettingsPopupProps {
   onOpenFullStudio: () => void;
   currentTrackTitle: string;
   onTrackTitleChange?: (title: string) => void;
+  performanceProfile: PerformanceProfile;
+  onPerformanceProfileChange: (profile: PerformanceProfile) => void;
 }
 
 export const CompanionSettingsPopup: React.FC<CompanionSettingsPopupProps> = ({
@@ -57,6 +62,8 @@ export const CompanionSettingsPopup: React.FC<CompanionSettingsPopupProps> = ({
   onOpenFullStudio,
   currentTrackTitle,
   onTrackTitleChange,
+  performanceProfile,
+  onPerformanceProfileChange,
 }) => {
   const cardRef = useRef<HTMLDivElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -298,7 +305,40 @@ export const CompanionSettingsPopup: React.FC<CompanionSettingsPopupProps> = ({
         />
       </div>
 
-      {/* 6. Switch Character Quick Bar */}
+      {/* 6. Device Performance Mode (High CPU/GPU vs Low-End Eco) */}
+      <div className="popup-perf-section">
+        <div className="popup-section-header">
+          <Cpu className="icon-xs" />
+          <span className="section-label">Device Performance Mode:</span>
+        </div>
+        <div className="perf-toggle-grid">
+          <button
+            className={`perf-mode-btn ${performanceProfile === 'high' ? 'perf-active-high' : ''}`}
+            onClick={() => onPerformanceProfileChange('high')}
+            title="High CPU & GPU: Full 60 FPS, High-DPI Retina, glowing shadows & rich particles"
+          >
+            <Zap className="icon-sm text-amber-400" />
+            <div className="perf-text-block">
+              <span className="perf-title">High-End (GPU)</span>
+              <span className="perf-desc">60 FPS • Retina • Glows</span>
+            </div>
+          </button>
+
+          <button
+            className={`perf-mode-btn ${performanceProfile === 'low' ? 'perf-active-low' : ''}`}
+            onClick={() => onPerformanceProfileChange('low')}
+            title="Low-End: 8-30 FPS adaptive, 1x DPI, no shadows, ultra-low CPU power saver"
+          >
+            <Leaf className="icon-sm text-emerald-400" />
+            <div className="perf-text-block">
+              <span className="perf-title">Low-End (Eco)</span>
+              <span className="perf-desc">8-30 FPS • 1x DPI • Low CPU</span>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      {/* 7. Switch Character Quick Bar */}
       <div className="popup-characters-section">
         <span className="section-label">Quick Switch:</span>
         <div className="character-pills-row">
