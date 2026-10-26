@@ -6,6 +6,11 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Linux](https://img.shields.io/badge/Platform-Linux%20GNOME%20X11-FCC624?logo=linux&logoColor=black)](https://www.ubuntu.com/)
 
+> ### 🌸 Dedicated to Denji & Reze (*Chainsaw Man: Bomb Girl Arc*)
+> *"Have you ever been in a pool at night, Denji? Let's run away together..."*
+>
+> This project was created as an affectionate fan tribute and love letter to **Denji and Reze** from Tatsuki Fujimoto's *Chainsaw Man* — bound together by the red thread of fate, hanging peacefully from your desktop screen while listening to the bittersweet night melody of *"in the pool"*.
+
 An interactive, transparent desktop companion application designed for Linux (GNOME / X11). The companion hangs from the top edge of your desktop screen by a thread, reacts to mouse touches, swings with realistic damped pendulum physics, plays beat-reactive music, and allows you to seamlessly switch characters or upload custom audio.
 
 Features **native click-through pass-through** (using X11 shape masking) so you can work and use other applications normally while your companion hangs on your desktop.
@@ -152,6 +157,29 @@ pop-ups/
 ├── LICENSE                     # MIT License
 └── package.json
 ```
+
+---
+
+## ⚖️ Legal Disclaimer, Intellectual Property & Fair Use Notice
+
+This software is an independent, non-commercial, open-source fan project created purely for educational, transformative artistic tribute, and personal desktop personalization purposes under the **MIT License**.
+
+### 1. Intellectual Property & Character Attribution
+All anime characters, character likenesses, names, and original musical compositions referenced or depicted in this repository are the sole intellectual property and copyrighted trademarks of their respective creators, publishers, and production studios:
+- **Chainsaw Man**, **Denji**, and **Reze**: © **Tatsuki Fujimoto / Shueisha, MAPPA**
+- **Jujutsu Kaisen**, **Gojo Satoru**, **Ryomen Sukuna**, **Yuji Itadori**, and **Yuta Okkotsu**: © **Gege Akutami / Shueisha, MAPPA**
+- **Original Soundtrack ("in the pool")**: Composed by **Kensuke Ushio (牛尾憲輔)**, © **Sony Music Entertainment (Japan) Inc. / MAPPA**
+
+### 2. Fair Use & Non-Commercial Statement
+- **Zero Monetization**: This repository and all associated software are 100% free, non-monetized, ad-free, and open source. No financial gain, commercial product sales, donations, or paid subscriptions are associated with this project.
+- **Transformative Fan Art**: The character artwork included in this repository consists of transformative, stylized chibi fan art and digital adaptations created solely to illustrate the desktop pendulum physics engine and window-masking overlay technology.
+- **No Affiliation or Endorsement**: This project is not affiliated with, endorsed by, sponsored by, or officially associated with Shueisha, MAPPA, Sony Music, Tatsuki Fujimoto, Gege Akutami, or any of their parent companies or subsidiaries.
+
+### 3. User-Provided Content
+The custom audio and character studio features allow individual end-users to import locally stored audio files and custom images on their private machines. Users are responsible for ensuring that their own personal media files comply with their applicable local copyright regulations.
+
+### 4. Takedown & Safe Harbor Requests (DMCA / Rightsholders)
+We respect the intellectual property of artists and original creators. If you are a copyright owner, author, or legal representative of any depicted character or music track and object to its inclusion in this open-source fan tribute, please open an issue or contact the repository maintainers. Any requested assets will be promptly removed or replaced upon notification in good faith compliance without dispute.
 
 ---
 
