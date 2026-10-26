@@ -19,22 +19,36 @@ Features **native click-through pass-through** (using X11 shape masking) so you 
 
 ## 📸 Companions & Artwork
 
-| **Gojo Satoru** (*Jujutsu Kaisen*) | **Ryomen Sukuna** (*Jujutsu Kaisen*) | **Yuji Itadori** (*Jujutsu Kaisen*) |
-|:---:|:---:|:---:|
-| <img src="public/gojo_satoru_512.png" width="220" alt="Gojo Satoru Desktop Pet" /> | <img src="public/sukuna_512.png" width="220" alt="Ryomen Sukuna Desktop Pet" /> | <img src="public/yuji_itadori_512.png" width="220" alt="Yuji Itadori Desktop Pet" /> |
-| *Six Eyes & Limitless* | *King of Curses & Crimson Silk* | *Sukuna's Vessel & Golden Wire* |
-
-| **Yuta Okkotsu** (*Jujutsu Kaisen 0*) | **Reze & Denji** (*Chainsaw Man*) |
+### 🌸 Romantic Anime Duos
+| **Reze & Denji** (*Chainsaw Man*) | **Eren & Mikasa** (*Attack on Titan*) |
 |:---:|:---:|
-| <img src="public/yuta_okkotsu_512.png" width="220" alt="Yuta Okkotsu Desktop Pet" /> | <img src="public/reze_denji_512.png" width="220" alt="Reze and Denji Desktop Pet" /> |
-| *Special Grade Sorcerer & Katana* | *Crimson Thread & "In the pool" OST* |
+| <img src="public/reze_denji_512.png" width="230" alt="Reze and Denji Desktop Pet" /> | <img src="public/eren_mikasa_512.png" width="230" alt="Eren and Mikasa Desktop Pet" /> |
+| *Crimson Thread & "In the pool" OST* | *Red Scarf of Fate & Scout Cloak* |
 
-Original generated reference artwork is preserved in [`art/`](./art/):
-- [`art/gojo_satoru_original.jpg`](./art/gojo_satoru_original.jpg)
-- [`art/sukuna_original.jpg`](./art/sukuna_original.jpg)
-- [`art/yuji_itadori_original.jpg`](./art/yuji_itadori_original.jpg)
-- [`art/yuta_okkotsu_original.jpg`](./art/yuta_okkotsu_original.jpg)
-- [`art/reze_denji_original.jpg`](./art/reze_denji_original.jpg)
+### ⚔️ Demon Slayer (*Kimetsu no Yaiba*)
+| **Tanjiro Kamado** | **Nezuko Kamado** | **Zenitsu Agatsuma** | **Inosuke Hashibira** |
+|:---:|:---:|:---:|:---:|
+| <img src="public/tanjiro_kamado_512.png" width="180" alt="Tanjiro Kamado" /> | <img src="public/nezuko_kamado_512.png" width="180" alt="Nezuko Kamado" /> | <img src="public/zenitsu_agatsuma_512.png" width="180" alt="Zenitsu Agatsuma" /> | <img src="public/inosuke_hashibira_512.png" width="180" alt="Inosuke Hashibira" /> |
+| *Sun Breathing & Haori* | *Bamboo Muzzle & Ribbon* | *Thunder Breathing & Sparks* | *Wild Boar & Dual Serrated Blades* |
+
+### 🏐 Haikyuu!!
+| **Shoyo Hinata** (*Karasuno #10*) | **Tobio Kageyama** (*Karasuno #9*) |
+|:---:|:---:|
+| <img src="public/shoyo_hinata_512.png" width="210" alt="Shoyo Hinata" /> | <img src="public/tobio_kageyama_512.png" width="210" alt="Tobio Kageyama" /> |
+| *The Ultimate Decoy & Volleyball* | *King of the Court & Setter Toss* |
+
+### 🤞 Jujutsu Kaisen
+| **Gojo Satoru** | **Ryomen Sukuna** | **Yuji Itadori** |
+|:---:|:---:|:---:|
+| <img src="public/gojo_satoru_512.png" width="190" alt="Gojo Satoru" /> | <img src="public/sukuna_512.png" width="190" alt="Ryomen Sukuna" /> | <img src="public/yuji_itadori_512.png" width="190" alt="Yuji Itadori" /> |
+| *Six Eyes & Limitless* | *King of Curses & Throne* | *Sukuna Vessel & Golden Wire* |
+
+| **Yuta Okkotsu** | **Megumi Fushiguro** | **Nobara Kugisaki** |
+|:---:|:---:|:---:|
+| <img src="public/yuta_okkotsu_512.png" width="190" alt="Yuta Okkotsu" /> | <img src="public/megumi_fushiguro_512.png" width="190" alt="Megumi Fushiguro" /> | <img src="public/nobara_kugisaki_512.png" width="190" alt="Nobara Kugisaki" /> |
+| *Special Grade & Katana* | *Ten Shadows & Divine Dog* | *Straw Doll & Resonance Hammer* |
+
+Original generated reference artwork is preserved in [`art/`](./art/).
 
 ---
 
@@ -167,7 +181,10 @@ This software is an independent, non-commercial, open-source fan project created
 ### 1. Intellectual Property & Character Attribution
 All anime characters, character likenesses, names, and original musical compositions referenced or depicted in this repository are the sole intellectual property and copyrighted trademarks of their respective creators, publishers, and production studios:
 - **Chainsaw Man**, **Denji**, and **Reze**: © **Tatsuki Fujimoto / Shueisha, MAPPA**
-- **Jujutsu Kaisen**, **Gojo Satoru**, **Ryomen Sukuna**, **Yuji Itadori**, and **Yuta Okkotsu**: © **Gege Akutami / Shueisha, MAPPA**
+- **Attack on Titan (Shingeki no Kyojin)**, **Eren Yeager**, and **Mikasa Ackerman**: © **Hajime Isayama / Kodansha, Wit Studio, MAPPA**
+- **Demon Slayer (Kimetsu no Yaiba)**, **Tanjiro Kamado**, **Nezuko Kamado**, **Zenitsu Agatsuma**, and **Inosuke Hashibira**: © **Koyoharu Gotouge / Shueisha, Aniplex, ufotable**
+- **Haikyuu!!**, **Shoyo Hinata**, and **Tobio Kageyama**: © **Haruichi Furudate / Shueisha, "Haikyu!!" Project, Production I.G**
+- **Jujutsu Kaisen**, **Gojo Satoru**, **Ryomen Sukuna**, **Yuji Itadori**, **Yuta Okkotsu**, **Megumi Fushiguro**, and **Nobara Kugisaki**: © **Gege Akutami / Shueisha, MAPPA**
 - **Original Soundtrack ("in the pool")**: Composed by **Kensuke Ushio (牛尾憲輔)**, © **Sony Music Entertainment (Japan) Inc. / MAPPA**
 
 ### 2. Fair Use & Non-Commercial Statement
