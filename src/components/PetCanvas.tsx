@@ -122,12 +122,68 @@ export const PetCanvas: React.FC<PetCanvasProps> = ({
     return () => window.removeEventListener('resize', handleResize);
   }, [anchorX]);
 
-  // Main Render & Physics Loop
+  // Main Render & Physics Loop — Adaptive FPS Scheduler
   useEffect(() => {
-    let animFrame: number;
+    // Two handles: one for rAF (high-fps), one for setTimeout (low-fps)
+    let rafHandle: number | null = null;
+    let timeoutHandle: ReturnType<typeof setTimeout> | null = null;
     let lastTime = performance.now();
 
-    const loop = (time: number) => {
+    /** Cancel whichever scheduling handle is currently active */
+    const cancelSchedule = () => {
+      if (rafHandle !== null) { cancelAnimationFrame(rafHandle); rafHandle = null; }
+      if (timeoutHandle !== null) { clearTimeout(timeoutHandle); timeoutHandle = null; }
+    };
+
+    /**
+     * Compute the target rendering FPS based on current activity level.
+     *
+     * Idle desktop pet sitting still: ~10 fps  → ~83% less work than 60 fps
+     * Sleeping (zzz mode):             ~6 fps  → ~90% less work than 60 fps
+     * Pendulum swinging / dancing:    ~30 fps  → ~50% less work than 60 fps
+     * User actively dragging:         ~60 fps  → full speed for smoothness
+     * Hidden (pin-only mode):          ~4 fps  → nearly zero overhead
+     */
+    const getTargetFPS = (
+      isDragging: boolean,
+      isDancing: boolean,
+      angleAbs: number,
+      hasParticles: boolean,
+      inactivitySecs: number,
+    ): number => {
+      if (isDragging)              return 60; // silky-smooth drag
+      if (isDancing)               return 30; // beat-synced bounce
+      if (angleAbs > 0.008)        return 30; // pendulum still swinging
+      if (hasParticles)            return 20; // floating hearts / notes
+      if (inactivitySecs < 3)      return 20; // just interacted
+      if (isBlinkingRef.current)   return 15; // mid-blink frame
+      if (currentExpression === 'sleepy') return 6; // deep sleep — barely anything moves
+      return 10; // default idle
+    };
+
+    /**
+     * Schedule the next frame.
+     * ≥55 fps  → requestAnimationFrame (vsync-locked, zero jitter).
+     * <55 fps  → setTimeout then rAF so the browser thread can genuinely
+     *            sleep for the delay interval instead of spinning on vsync.
+     */
+    const scheduleNext = (fps: number) => {
+      cancelSchedule();
+      if (fps >= 55) {
+        rafHandle = requestAnimationFrame(loop);
+      } else {
+        const delayMs = Math.max(0, Math.round(1000 / fps) - 4);
+        timeoutHandle = window.setTimeout(() => {
+          timeoutHandle = null;
+          rafHandle = requestAnimationFrame(loop);
+        }, delayMs);
+      }
+    };
+
+    // loop accepts optional timestamp: rAF provides it; setTimeout calls without
+    const loop = (timeArg?: number) => {
+      rafHandle = null;
+      const time = timeArg ?? performance.now();
       const dt = Math.min(0.05, (time - lastTime) / 1000);
       lastTime = time;
 
@@ -150,7 +206,7 @@ export const PetCanvas: React.FC<PetCanvasProps> = ({
         // Draw discrete top screen pin so user can re-open settings
         drawHiddenPin(ctx, physicsRef.current.state.anchorX);
         ctx.restore();
-        animFrame = requestAnimationFrame(loop);
+        scheduleNext(4); // ultra-low rate — pin barely changes
         return;
       }
 
@@ -167,8 +223,6 @@ export const PetCanvas: React.FC<PetCanvasProps> = ({
         physics.state.bobY = 220;
         physics.state.angle = 0;
       }
-
-
 
       // Timing states
       breatheTimeRef.current += dt;
@@ -261,17 +315,22 @@ export const PetCanvas: React.FC<PetCanvasProps> = ({
         );
       }
 
-
-
       ctx.restore(); // restores character save
-
       ctx.restore(); // restores outer DPR scale
 
-      animFrame = requestAnimationFrame(loop);
+      // --- Adaptive FPS: pick the right rate for current activity ---
+      const targetFPS = getTargetFPS(
+        physics.state.isDragging,
+        isDancing,
+        Math.abs(physics.state.angle),
+        particlesRef.current.length > 0,
+        inactivityTimerRef.current,
+      );
+      scheduleNext(targetFPS);
     };
 
-    animFrame = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(animFrame);
+    scheduleNext(20); // start at 20fps; ramps automatically
+    return () => cancelSchedule();
   }, [character, petEnabled, musicEnabled, hangingEnabled, currentExpression, mousePos, spawnParticle, onExpressionChange]);
 
   // Update and render floating particles (Notes, Hearts, Zzz, Sparkles)

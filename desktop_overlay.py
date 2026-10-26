@@ -3,6 +3,11 @@
 ThreadPet AI - Native Linux GNOME Desktop Transparent Overlay
 Runs a frameless, 100% transparent, always-on-top window directly on your Ubuntu desktop.
 Features dynamic input-shape masking so clicks pass through to other applications!
+
+Usage:
+  python3 desktop_overlay.py            # auto-serve built dist/ (low CPU)
+  python3 desktop_overlay.py --dev      # use Vite dev server on :5173
+  python3 desktop_overlay.py <url>      # custom URL
 """
 
 import sys
@@ -10,6 +15,10 @@ import os
 import signal
 import json
 import base64
+import threading
+import functools
+import socketserver
+import http.server
 import gi
 
 # Prefer X11 backend for guaranteed stick(), keep_above(), and ShapeInput pass-through on GNOME
@@ -23,8 +32,71 @@ gi.require_version('WebKit2', '4.1')
 from gi.repository import Gtk, Gdk, WebKit2, GLib
 import cairo
 
+
+# ---------------------------------------------------------------------------
+# Embedded lightweight static file server
+# Replaces the heavy Vite dev server at runtime → much lower CPU usage.
+# ---------------------------------------------------------------------------
+
+class _SilentHandler(http.server.SimpleHTTPRequestHandler):
+    """SimpleHTTPRequestHandler with all logging suppressed."""
+    def log_message(self, _fmt, *_args):
+        pass  # silence request logs
+
+class StaticFileServer:
+    """Serves a local directory over HTTP in a background daemon thread."""
+
+    def __init__(self, directory: str, port: int = 5174):
+        self.directory = directory
+        self.port = port
+        self._httpd: socketserver.TCPServer | None = None
+        self._thread: threading.Thread | None = None
+
+    def start(self) -> str:
+        handler = functools.partial(_SilentHandler, directory=self.directory)
+        # Allow immediate port reuse so relaunching the app doesn't get EADDRINUSE
+        socketserver.TCPServer.allow_reuse_address = True
+        self._httpd = socketserver.TCPServer(("127.0.0.1", self.port), handler)
+        self._thread = threading.Thread(
+            target=self._httpd.serve_forever,
+            daemon=True,
+            name="ThreadPet-StaticServer",
+        )
+        self._thread.start()
+        url = f"http://127.0.0.1:{self.port}"
+        print(f"[StaticServer] Serving '{self.directory}' → {url}")
+        return url
+
+    def stop(self):
+        if self._httpd:
+            self._httpd.shutdown()
+
+
+# ---------------------------------------------------------------------------
+# GTK / WebKit overlay window
+# ---------------------------------------------------------------------------
+
 class DesktopPetOverlay:
-    def __init__(self, target_url="http://127.0.0.1:5173"):
+    def __init__(self, target_url: str = "http://127.0.0.1:5173"):
+        self._static_server: StaticFileServer | None = None
+
+        # --- Determine URL ---------------------------------------------------
+        # If no explicit URL/--dev is requested and dist/ exists, self-host it.
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        dist_index = os.path.join(script_dir, "dist", "index.html")
+
+        if target_url == "__auto__":
+            if os.path.exists(dist_index):
+                dist_dir = os.path.join(script_dir, "dist")
+                self._static_server = StaticFileServer(dist_dir, port=5174)
+                target_url = self._static_server.start()
+                print("[DesktopPetOverlay] ✓ Using built static files (low-CPU mode)")
+            else:
+                target_url = "http://127.0.0.1:5173"
+                print("[DesktopPetOverlay] dist/ not found — falling back to Vite dev server")
+                print("  Run 'npm run build' first for the lightest possible CPU footprint.")
+
+        # --- GTK Window ------------------------------------------------------
         self.window = Gtk.Window(type=Gtk.WindowType.TOPLEVEL)
         self.window.set_title("ThreadPet AI — Reze & Denji")
         self.window.set_decorated(False)
@@ -55,7 +127,7 @@ class DesktopPetOverlay:
         self.window.set_default_size(self.screen_width, self.screen_height)
         self.window.move(0, 0)
 
-        # Set up IPC UserContentManager for dynamic click-through hitboxes & audio persistence
+        # --- WebKit IPC ------------------------------------------------------
         self.ucm = WebKit2.UserContentManager()
         self.ucm.register_script_message_handler("hitbox")
         self.ucm.connect("script-message-received::hitbox", self.on_hitbox_message)
@@ -66,13 +138,13 @@ class DesktopPetOverlay:
         self.ucm.register_script_message_handler("clear_audio")
         self.ucm.connect("script-message-received::clear_audio", self.on_clear_audio)
 
-        # WebKit Webview with content manager
+        # --- WebKit WebView --------------------------------------------------
         self.webview = WebKit2.WebView.new_with_user_content_manager(self.ucm)
         self.webview.connect("run-file-chooser", self.on_run_file_chooser)
         transparent_color = Gdk.RGBA(0, 0, 0, 0)
         self.webview.set_background_color(transparent_color)
 
-        # Configure WebKit Settings for uninhibited Audio and Media playback
+        # Configure WebKit settings
         settings = self.webview.get_settings()
         settings.set_enable_write_console_messages_to_stdout(True)
         settings.set_enable_webaudio(True)
@@ -80,15 +152,26 @@ class DesktopPetOverlay:
         settings.set_enable_mediasource(True)
         settings.set_media_playback_requires_user_gesture(False)
         settings.set_media_playback_allows_inline(True)
+        # Hardware acceleration — let GPU handle compositing so CPU is free
+        settings.set_hardware_acceleration_policy(
+            WebKit2.HardwareAccelerationPolicy.ALWAYS
+        )
 
         self.webview.load_uri(target_url)
 
         self.window.add(self.webview)
-        self.window.connect("destroy", Gtk.main_quit)
+        self.window.connect("destroy", self._on_destroy)
         self.window.connect("realize", self.on_window_realize)
 
         # Handle SIGINT cleanly
         GLib.unix_signal_add(GLib.PRIORITY_DEFAULT, signal.SIGINT, Gtk.main_quit)
+
+    # -------------------------------------------------------------------------
+
+    def _on_destroy(self, _widget):
+        if self._static_server:
+            self._static_server.stop()
+        Gtk.main_quit()
 
     def on_run_file_chooser(self, webview, request):
         """Native GTK file dialog so clicking 'Upload Music' works 100% reliably."""
@@ -109,11 +192,8 @@ class DesktopPetOverlay:
             filter_audio = Gtk.FileFilter()
             filter_audio.set_name("Audio Files (*.mp3, *.wav, *.ogg, *.m4a, *.flac)")
             filter_audio.add_mime_type("audio/*")
-            filter_audio.add_pattern("*.mp3")
-            filter_audio.add_pattern("*.wav")
-            filter_audio.add_pattern("*.ogg")
-            filter_audio.add_pattern("*.m4a")
-            filter_audio.add_pattern("*.flac")
+            for ext in ("*.mp3", "*.wav", "*.ogg", "*.m4a", "*.flac"):
+                filter_audio.add_pattern(ext)
             dialog.add_filter(filter_audio)
 
             filter_all = Gtk.FileFilter()
@@ -215,12 +295,10 @@ class DesktopPetOverlay:
         try:
             script_dir = os.path.dirname(os.path.abspath(__file__))
             public_dir = os.path.join(script_dir, "public")
-            target_path = os.path.join(public_dir, "custom_track.audio")
-            meta_path = os.path.join(public_dir, "custom_track_meta.json")
-            if os.path.exists(target_path):
-                os.remove(target_path)
-            if os.path.exists(meta_path):
-                os.remove(meta_path)
+            for fname in ("custom_track.audio", "custom_track_meta.json"):
+                path = os.path.join(public_dir, fname)
+                if os.path.exists(path):
+                    os.remove(path)
             print("[DesktopPetOverlay] Cleared custom audio files.")
         except Exception as e:
             print("[DesktopPetOverlay] Error clearing audio:", e, file=sys.stderr)
@@ -229,7 +307,25 @@ class DesktopPetOverlay:
         self.window.show_all()
         Gtk.main()
 
+
+# ---------------------------------------------------------------------------
+# Entry point
+# ---------------------------------------------------------------------------
+
 if __name__ == "__main__":
-    url = sys.argv[1] if len(sys.argv) > 1 else "http://127.0.0.1:5173"
+    # Parse args:
+    #   --dev          → force Vite dev server at :5173
+    #   <url>          → explicit URL
+    #   (nothing)      → auto-detect (prefer dist/)
+    args = sys.argv[1:]
+
+    if "--dev" in args:
+        url = "http://127.0.0.1:5173"
+        print("[DesktopPetOverlay] --dev flag: using Vite dev server")
+    elif args and not args[0].startswith("--"):
+        url = args[0]
+    else:
+        url = "__auto__"  # sentinel → auto-serve dist/ if available
+
     app = DesktopPetOverlay(target_url=url)
     app.run()
