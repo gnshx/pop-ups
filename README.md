@@ -14,13 +14,21 @@ Features **native click-through pass-through** (using X11 shape masking) so you 
 
 ## 📸 Companions & Artwork
 
-| **Gojo Satoru** (*Jujutsu Kaisen*) | **Reze & Denji** (*Chainsaw Man*) |
+| **Gojo Satoru** (*Jujutsu Kaisen*) | **Ryomen Sukuna** (*Jujutsu Kaisen*) | **Yuji Itadori** (*Jujutsu Kaisen*) |
+|:---:|:---:|:---:|
+| <img src="public/gojo_satoru_512.png" width="220" alt="Gojo Satoru Desktop Pet" /> | <img src="public/sukuna_512.png" width="220" alt="Ryomen Sukuna Desktop Pet" /> | <img src="public/yuji_itadori_512.png" width="220" alt="Yuji Itadori Desktop Pet" /> |
+| *Six Eyes & Limitless* | *King of Curses & Crimson Silk* | *Sukuna's Vessel & Golden Wire* |
+
+| **Yuta Okkotsu** (*Jujutsu Kaisen 0*) | **Reze & Denji** (*Chainsaw Man*) |
 |:---:|:---:|
-| <img src="public/gojo_satoru_512.png" width="260" alt="Gojo Satoru Desktop Pet" /> | <img src="public/reze_denji_512.png" width="260" alt="Reze and Denji Desktop Pet" /> |
-| *Domain Expansion, Six Eyes & Limitless* | *Hanging by Crimson Thread & "In the pool" OST* |
+| <img src="public/yuta_okkotsu_512.png" width="220" alt="Yuta Okkotsu Desktop Pet" /> | <img src="public/reze_denji_512.png" width="220" alt="Reze and Denji Desktop Pet" /> |
+| *Special Grade Sorcerer & Katana* | *Crimson Thread & "In the pool" OST* |
 
 Original generated reference artwork is preserved in [`art/`](./art/):
 - [`art/gojo_satoru_original.jpg`](./art/gojo_satoru_original.jpg)
+- [`art/sukuna_original.jpg`](./art/sukuna_original.jpg)
+- [`art/yuji_itadori_original.jpg`](./art/yuji_itadori_original.jpg)
+- [`art/yuta_okkotsu_original.jpg`](./art/yuta_okkotsu_original.jpg)
 - [`art/reze_denji_original.jpg`](./art/reze_denji_original.jpg)
 
 ---
@@ -115,13 +123,17 @@ Open `http://localhost:5173` in any modern web browser.
 pop-ups/
 ├── art/                        # Original generated artwork
 │   ├── gojo_satoru_original.jpg
+│   ├── sukuna_original.jpg
+│   ├── yuji_itadori_original.jpg
+│   ├── yuta_okkotsu_original.jpg
 │   └── reze_denji_original.jpg
 ├── desktop_overlay.py          # Native Linux GTK3/WebKit2 transparent overlay
 ├── public/                     # Static assets, transparent PNGs, audio
 │   ├── gojo_satoru.png
-│   ├── gojo_satoru_512.png
+│   ├── sukuna.png
+│   ├── yuji_itadori.png
+│   ├── yuta_okkotsu.png
 │   ├── reze_denji.png
-│   ├── reze_denji_512.png
 │   ├── in_the_pool.mp3
 │   └── custom_track_meta.json
 ├── src/

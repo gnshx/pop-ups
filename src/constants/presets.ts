@@ -46,6 +46,72 @@ export const DEFAULT_CHARACTERS: CharacterConfig[] = [
     imageUrl: '/gojo_satoru.png',
   },
   {
+    id: 'sukuna',
+    name: 'Ryomen Sukuna (Jujutsu Kaisen)',
+    personality: 'The King of Curses resting atop his throne, adorned in traditional kimono and malevolent black curse markings.',
+    hairStyle: 'short',
+    hairColor: '#f43f5e', // Spiky light pink hair
+    hairHighlight: '#fb7185',
+    eyeStyle: 'cat_slit',
+    eyeColor: '#dc2626', // Piercing crimson red
+    skinTone: '#fff1f2',
+    hoodieColor: '#18181b', // White / dark kimono
+    hoodieAccent: '#991b1b', // Deep crimson
+    hoodiePocket: false,
+    accessories: ['none'],
+    accessoryColor: '#991b1b',
+    threadType: 'crimson_silk',
+    threadColor: '#dc2626',
+    threadLength: 175,
+    scale: 1.05,
+    currentExpression: 'happy',
+    imageUrl: '/sukuna.png',
+  },
+  {
+    id: 'yuji_itadori',
+    name: 'Yuji Itadori (Jujutsu Kaisen)',
+    personality: 'The vessel of Sukuna with immense physical power and an indomitable warm heart, ready to protect everyone.',
+    hairStyle: 'short',
+    hairColor: '#fb7185', // Spiky pink hair with black undercut
+    hairHighlight: '#f43f5e',
+    eyeStyle: 'anime_round',
+    eyeColor: '#9a3412', // Warm hazel / amber brown
+    skinTone: '#fff1f2',
+    hoodieColor: '#0f172a', // Jujutsu Tech navy uniform
+    hoodieAccent: '#ef4444', // Red hooded collar
+    hoodiePocket: true,
+    accessories: ['none'],
+    accessoryColor: '#ef4444',
+    threadType: 'golden_wire',
+    threadColor: '#f59e0b',
+    threadLength: 175,
+    scale: 1.05,
+    currentExpression: 'happy',
+    imageUrl: '/yuji_itadori.png',
+  },
+  {
+    id: 'yuta_okkotsu',
+    name: 'Yuta Okkotsu (Jujutsu Kaisen)',
+    personality: 'Special Grade Jujutsu Sorcerer bound to Rika, wielding his katana with boundless cursed energy.',
+    hairStyle: 'short',
+    hairColor: '#1e1b4b', // Dark midnight black
+    hairHighlight: '#312e81',
+    eyeStyle: 'anime_round',
+    eyeColor: '#0284c7', // Dark blue / gray
+    skinTone: '#fff1f2',
+    hoodieColor: '#f8fafc', // White Jujutsu High jacket
+    hoodieAccent: '#3b82f6', // Katana strap accent
+    hoodiePocket: true,
+    accessories: ['none'],
+    accessoryColor: '#3b82f6',
+    threadType: 'twilight_purple',
+    threadColor: '#a855f7',
+    threadLength: 175,
+    scale: 1.05,
+    currentExpression: 'happy',
+    imageUrl: '/yuta_okkotsu.png',
+  },
+  {
     id: 'luna',
     name: 'Luna (ルナ)',
     personality: 'Sleepy & gentle anime companion who loves lofi beats and napping.',
