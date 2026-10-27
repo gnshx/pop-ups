@@ -92,14 +92,25 @@ sudo apt update
 sudo apt install -y python3 python3-gi python3-gi-cairo gir1.2-gtk-3.0 gir1.2-webkit2-4.1 nodejs npm
 ```
 
-### Installation
+### Installation (All-in-One)
 
-Clone the repository and install dependencies:
+Clone the repository and install all dependencies (npm packages, Python `requirements.txt`, and build) in one go:
 ```bash
 git clone git@github.com:gnshx/pop-ups.git
 cd pop-ups
+
+# Option A: One-go setup script (recommended)
+./setup.sh
+# or:
+npm run setup
+
+# Option B: Manual npm & python install
 npm install
+pip install -r requirements.txt
+npm run build
 ```
+
+> **Note:** If you launch `./run_high.sh` or `./run_low.sh` right away, it will also automatically detect and download any missing npm dependencies and build the app for you!
 
 ### ⚡ Running the 2 Versions
 

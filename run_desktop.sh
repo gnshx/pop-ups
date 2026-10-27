@@ -51,6 +51,24 @@ for arg in "$@"; do
     esac
 done
 
+# --- Auto-install npm dependencies if missing ---
+if [[ ! -d "node_modules" ]]; then
+    echo -e "${YELLOW}node_modules not found. Installing dependencies in one go...${NC}"
+    npm install
+    echo -e "${GREEN}✓ npm install complete!${NC}"
+fi
+
+# --- Verify Python transparent desktop bindings ---
+if ! python3 -c "import gi, cairo" 2>/dev/null; then
+    echo -e "${YELLOW}Notice: Missing Python GTK/Cairo dependencies.${NC}"
+    if [[ -f "requirements.txt" ]]; then
+        echo -e "${CYAN}Attempting to install from requirements.txt...${NC}"
+        pip3 install -r requirements.txt --quiet 2>/dev/null || \
+        pip3 install -r requirements.txt --break-system-packages --quiet 2>/dev/null || \
+        echo -e "${YELLOW}For system packages, run: ./setup.sh${NC}"
+    fi
+fi
+
 # --- Dev mode: skip build, use Vite HMR ---
 if [[ " ${ARGS[*]:-} " =~ " --dev " ]]; then
     echo -e "${YELLOW}[dev mode] Starting Vite dev server + overlay...${NC}"

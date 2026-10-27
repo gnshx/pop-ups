@@ -1,0 +1,14 @@
+# ThreadPet / Pop-ups - Python Requirements
+# ----------------------------------------------------------------------------
+# Core desktop transparent overlay dependencies (GTK3 & Cairo):
+PyGObject>=3.42.0
+pycairo>=1.20.0
+
+# Asset processing & procedural audio generation:
+numpy>=1.24.0
+Pillow>=10.0.0
+
+# ----------------------------------------------------------------------------
+# Note for Debian/Ubuntu users:
+# You can also install system packages directly via apt:
+#   sudo apt install -y python3-gi python3-gi-cairo gir1.2-gtk-3.0 gir1.2-webkit2-4.1 python3-numpy python3-pil

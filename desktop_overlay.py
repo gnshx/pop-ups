@@ -17,6 +17,10 @@ import json
 import base64
 import threading
 import functools
+import shutil
+import email.utils
+import datetime
+import mimetypes
 import socketserver
 import http.server
 import gi
@@ -36,12 +40,164 @@ import cairo
 # ---------------------------------------------------------------------------
 # Embedded lightweight static file server
 # Replaces the heavy Vite dev server at runtime → much lower CPU usage.
+# Supports HTTP 206 Partial Content (Range requests) for audio streaming and
+# silently handles client disconnects (BrokenPipeError) when requests abort.
 # ---------------------------------------------------------------------------
 
+def is_client_disconnect(exc: BaseException | None) -> bool:
+    """Return True if exception represents a standard client disconnection / abort."""
+    if exc is None:
+        return False
+    if isinstance(exc, (BrokenPipeError, ConnectionResetError, ConnectionAbortedError)):
+        return True
+    if isinstance(exc, OSError) and exc.errno in (32, 104, 103):  # EPIPE, ECONNRESET, ECONNABORTED
+        return True
+    return False
+
+class ThreadedStaticServer(socketserver.ThreadingTCPServer):
+    """Multi-threaded TCP server that suppresses harmless client disconnect traces."""
+    allow_reuse_address = True
+    daemon_threads = True
+
+    def handle_error(self, request, client_address):
+        exc_type, exc_val, _ = sys.exc_info()
+        if is_client_disconnect(exc_val) or (exc_type and issubclass(exc_type, (BrokenPipeError, ConnectionResetError, ConnectionAbortedError))):
+            return  # Benign client-side cancellation / disconnection
+        super().handle_error(request, client_address)
+
 class _SilentHandler(http.server.SimpleHTTPRequestHandler):
-    """SimpleHTTPRequestHandler with all logging suppressed."""
+    """SimpleHTTPRequestHandler with HTTP Range support and suppressed broken pipe logs."""
+
+    extensions_map = {
+        **http.server.SimpleHTTPRequestHandler.extensions_map,
+        ".audio": "audio/mpeg",
+        ".mp3": "audio/mpeg",
+        ".wav": "audio/wav",
+        ".ogg": "audio/ogg",
+        ".m4a": "audio/mp4",
+        ".flac": "audio/flac",
+    }
+
     def log_message(self, _fmt, *_args):
         pass  # silence request logs
+
+    def send_head(self):
+        path = self.translate_path(self.path)
+        if os.path.isdir(path):
+            return super().send_head()
+
+        ctype = self.guess_type(path)
+        try:
+            f = open(path, "rb")
+        except OSError:
+            self.send_error(http.HTTPStatus.NOT_FOUND, "File not found")
+            return None
+
+        try:
+            fs = os.fstat(f.fileno())
+            file_size = fs[6]
+
+            # Cache check (If-Modified-Since)
+            if "If-Modified-Since" in self.headers and "If-None-Match" not in self.headers:
+                try:
+                    ims = email.utils.parsedate_to_datetime(self.headers["If-Modified-Since"])
+                    if ims.tzinfo is None:
+                        ims = ims.replace(tzinfo=datetime.timezone.utc)
+                    if ims.tzinfo is datetime.timezone.utc:
+                        last_modif = datetime.datetime.fromtimestamp(fs.st_mtime, datetime.timezone.utc).replace(microsecond=0)
+                        if last_modif <= ims:
+                            self.send_response(http.HTTPStatus.NOT_MODIFIED)
+                            self.end_headers()
+                            f.close()
+                            return None
+                except Exception:
+                    pass
+
+            # HTTP 206 Partial Content support for audio/media streaming
+            range_header = self.headers.get("Range")
+            if range_header and range_header.startswith("bytes="):
+                val = range_header[6:].strip()
+                if "," not in val:
+                    parts = val.split("-")
+                    if len(parts) == 2:
+                        raw_start, raw_end = parts[0].strip(), parts[1].strip()
+                        start, end = None, None
+                        if raw_start == "" and raw_end != "":
+                            length = int(raw_end)
+                            if length > 0:
+                                start = max(0, file_size - length)
+                                end = file_size - 1
+                        elif raw_start != "" and raw_end == "":
+                            start = int(raw_start)
+                            end = file_size - 1
+                        elif raw_start != "" and raw_end != "":
+                            start = int(raw_start)
+                            end = int(raw_end)
+
+                        if start is not None and end is not None:
+                            if start > end or start >= file_size:
+                                self.send_error(http.HTTPStatus.REQUESTED_RANGE_NOT_SATISFIABLE)
+                                self.send_header("Content-Range", f"bytes */{file_size}")
+                                self.end_headers()
+                                f.close()
+                                return None
+
+                            end = min(end, file_size - 1)
+                            self._range_length = end - start + 1
+                            f.seek(start)
+                            self.send_response(http.HTTPStatus.PARTIAL_CONTENT)
+                            self.send_header("Content-Type", ctype)
+                            self.send_header("Content-Range", f"bytes {start}-{end}/{file_size}")
+                            self.send_header("Content-Length", str(self._range_length))
+                            self.send_header("Accept-Ranges", "bytes")
+                            self.send_header("Last-Modified", self.date_time_string(fs.st_mtime))
+                            self.end_headers()
+                            return f
+
+            # Standard 200 OK
+            self._range_length = None
+            self.send_response(http.HTTPStatus.OK)
+            self.send_header("Content-Type", ctype)
+            self.send_header("Content-Length", str(file_size))
+            self.send_header("Accept-Ranges", "bytes")
+            self.send_header("Last-Modified", self.date_time_string(fs.st_mtime))
+            self.end_headers()
+            return f
+        except Exception:
+            f.close()
+            raise
+
+    def copyfile(self, source, outputfile):
+        try:
+            length = getattr(self, "_range_length", None)
+            if length is None:
+                shutil.copyfileobj(source, outputfile, 64 * 1024)
+            else:
+                remaining = length
+                bufsize = 64 * 1024
+                while remaining > 0:
+                    chunk = source.read(min(remaining, bufsize))
+                    if not chunk:
+                        break
+                    outputfile.write(chunk)
+                    remaining -= len(chunk)
+        except Exception as e:
+            if not is_client_disconnect(e):
+                raise
+
+    def handle(self):
+        try:
+            super().handle()
+        except Exception as e:
+            if not is_client_disconnect(e):
+                raise
+
+    def finish(self):
+        try:
+            super().finish()
+        except Exception as e:
+            if not is_client_disconnect(e):
+                raise
 
 class StaticFileServer:
     """Serves a local directory over HTTP in a background daemon thread."""
@@ -49,27 +205,45 @@ class StaticFileServer:
     def __init__(self, directory: str, port: int = 5174):
         self.directory = directory
         self.port = port
-        self._httpd: socketserver.TCPServer | None = None
+        self._httpd: ThreadedStaticServer | None = None
         self._thread: threading.Thread | None = None
 
     def start(self) -> str:
         handler = functools.partial(_SilentHandler, directory=self.directory)
-        # Allow immediate port reuse so relaunching the app doesn't get EADDRINUSE
-        socketserver.TCPServer.allow_reuse_address = True
-        self._httpd = socketserver.TCPServer(("127.0.0.1", self.port), handler)
+        ThreadedStaticServer.allow_reuse_address = True
+
+        # Try preferred port; if occupied, search adjacent ports
+        httpd = None
+        chosen_port = self.port
+        for p in [self.port, self.port + 1, self.port + 2, 0]:
+            try:
+                httpd = ThreadedStaticServer(("127.0.0.1", p), handler)
+                chosen_port = httpd.server_address[1]
+                break
+            except OSError:
+                continue
+
+        if not httpd:
+            raise RuntimeError(f"Could not bind static file server to any port starting from {self.port}")
+
+        self._httpd = httpd
         self._thread = threading.Thread(
             target=self._httpd.serve_forever,
             daemon=True,
             name="ThreadPet-StaticServer",
         )
         self._thread.start()
-        url = f"http://127.0.0.1:{self.port}"
+        url = f"http://127.0.0.1:{chosen_port}"
         print(f"[StaticServer] Serving '{self.directory}' → {url}")
         return url
 
     def stop(self):
         if self._httpd:
-            self._httpd.shutdown()
+            try:
+                self._httpd.shutdown()
+                self._httpd.server_close()
+            except Exception:
+                pass
 
 
 # ---------------------------------------------------------------------------
@@ -269,7 +443,7 @@ class DesktopPetOverlay:
             print("Hitbox processing error:", e, file=sys.stderr)
 
     def on_save_audio(self, ucm, js_result):
-        """Save user uploaded audio to public/ folder so it permanently survives restarts!"""
+        """Save user uploaded audio to public/ and dist/ folders so it permanently survives restarts!"""
         try:
             val = js_result.get_js_value()
             if not val:
@@ -284,41 +458,58 @@ class DesktopPetOverlay:
             raw_bytes = base64.b64decode(base64_data)
             script_dir = os.path.dirname(os.path.abspath(__file__))
             public_dir = os.path.join(script_dir, "public")
-            os.makedirs(public_dir, exist_ok=True)
+            dist_dir = os.path.join(script_dir, "dist")
 
-            target_path = os.path.join(public_dir, "custom_track.audio")
-            with open(target_path, "wb") as f:
-                f.write(raw_bytes)
+            target_dirs = [public_dir]
+            if os.path.exists(dist_dir):
+                target_dirs.append(dist_dir)
 
-            meta_path = os.path.join(public_dir, "custom_track_meta.json")
             title = os.path.splitext(file_name)[0]
-            with open(meta_path, "w", encoding="utf-8") as f:
-                json.dump({
-                    "title": title,
-                    "fileName": file_name,
-                    "hasCustom": True,
-                    "timestamp": int(os.path.getmtime(target_path) * 1000)
-                }, f)
+            for target_dir in target_dirs:
+                os.makedirs(target_dir, exist_ok=True)
+                target_path = os.path.join(target_dir, "custom_track.audio")
+                with open(target_path, "wb") as f:
+                    f.write(raw_bytes)
+
+                meta_path = os.path.join(target_dir, "custom_track_meta.json")
+                with open(meta_path, "w", encoding="utf-8") as f:
+                    json.dump({
+                        "title": title,
+                        "fileName": file_name,
+                        "hasCustom": True,
+                        "timestamp": int(os.path.getmtime(target_path) * 1000)
+                    }, f)
             print(f"[DesktopPetOverlay] Permanently saved audio: {file_name} ({len(raw_bytes)} bytes)")
         except Exception as e:
             print("[DesktopPetOverlay] Error saving audio:", e, file=sys.stderr)
 
     def on_clear_audio(self, ucm, js_result):
-        """Clear custom audio files from public directory on user reset."""
+        """Clear custom audio files from public/ and dist/ directories on user reset."""
         try:
             script_dir = os.path.dirname(os.path.abspath(__file__))
             public_dir = os.path.join(script_dir, "public")
-            for fname in ("custom_track.audio", "custom_track_meta.json"):
-                path = os.path.join(public_dir, fname)
-                if os.path.exists(path):
-                    os.remove(path)
+            dist_dir = os.path.join(script_dir, "dist")
+
+            target_dirs = [public_dir]
+            if os.path.exists(dist_dir):
+                target_dirs.append(dist_dir)
+
+            for target_dir in target_dirs:
+                for fname in ("custom_track.audio", "custom_track_meta.json"):
+                    path = os.path.join(target_dir, fname)
+                    if os.path.exists(path):
+                        os.remove(path)
             print("[DesktopPetOverlay] Cleared custom audio files.")
         except Exception as e:
             print("[DesktopPetOverlay] Error clearing audio:", e, file=sys.stderr)
 
     def run(self):
-        self.window.show_all()
-        Gtk.main()
+        try:
+            self.window.show_all()
+            Gtk.main()
+        finally:
+            if self._static_server:
+                self._static_server.stop()
 
 
 # ---------------------------------------------------------------------------

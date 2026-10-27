@@ -8,7 +8,12 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
+    "setup": "bash ./setup.sh",
+    "install:all": "npm install && (pip3 install -r requirements.txt 2>/dev/null || pip3 install -r requirements.txt --break-system-packages)",
+    "install:py": "pip3 install -r requirements.txt 2>/dev/null || pip3 install -r requirements.txt --break-system-packages",
     "desktop": "python3 desktop_overlay.py",
+    "desktop:high": "./run_high.sh",
+    "desktop:low": "./run_low.sh",
     "desktop:chrome": "google-chrome --app=http://127.0.0.1:5173 --window-size=1920,1080",
     "tauri": "tauri"
   },
