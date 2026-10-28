@@ -68,6 +68,28 @@ export const DEFAULT_CHARACTERS: CharacterConfig[] = [
     imageUrl: '/gagan_kundana_512.png',
   },
   {
+    id: 'ayanokoji_kiyotaka',
+    name: 'Ayanokoji Kiyotaka (Classroom of the Elite)',
+    personality: 'The calm, enigmatic mastermind from the White Room who views everything as a game of chess, casually floating with his King piece.',
+    hairStyle: 'short',
+    hairColor: '#78350f', // Auburn brown
+    hairHighlight: '#92400e',
+    eyeStyle: 'anime_round',
+    eyeColor: '#d97706', // Piercing amber eyes
+    skinTone: '#fff1f2',
+    hoodieColor: '#991b1b', // Crimson red maroon school blazer
+    hoodieAccent: '#eab308', // Gold trim & buttons
+    hoodiePocket: true,
+    accessories: ['none'],
+    accessoryColor: '#1e3a8a',
+    threadType: 'twilight_purple',
+    threadColor: '#991b1b',
+    threadLength: 175,
+    scale: 1.05,
+    currentExpression: 'idle',
+    imageUrl: '/ayanokoji_512.png',
+  },
+  {
     id: 'gojo_satoru',
     name: 'Gojo Satoru (Jujutsu Kaisen)',
     personality: 'The strongest sorcerer with Six Eyes and Domain Expansion, chilling as your desktop companion.',

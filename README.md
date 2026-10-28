@@ -48,6 +48,12 @@ Features **native click-through pass-through** (using X11 shape masking) so you 
 | <img src="public/yuta_okkotsu_512.png" width="190" alt="Yuta Okkotsu" /> | <img src="public/megumi_fushiguro_512.png" width="190" alt="Megumi Fushiguro" /> | <img src="public/nobara_kugisaki_512.png" width="190" alt="Nobara Kugisaki" /> |
 | *Special Grade & Katana* | *Ten Shadows & Divine Dog* | *Straw Doll & Resonance Hammer* |
 
+### ♟️ Classroom of the Elite (*Youkoso Jitsuryoku Shijou Shugi no Kyoushitsu e*)
+| **Kiyotaka Ayanokoji** |
+|:---:|
+| <img src="public/ayanokoji_512.png" width="190" alt="Kiyotaka Ayanokoji" /> |
+| *White Room Mastermind • Casual Chess King • Crimson Academy Blazer* |
+
 Original generated reference artwork is preserved in [`art/`](./art/).
 
 ---
@@ -174,18 +180,21 @@ Open `http://localhost:5173` in any web browser.
 ```
 pop-ups/
 ├── art/                        # Original generated artwork
+│   ├── ayanokoji_original.jpg
 │   ├── gojo_satoru_original.jpg
 │   ├── sukuna_original.jpg
 │   ├── yuji_itadori_original.jpg
 │   ├── yuta_okkotsu_original.jpg
+│   ├── dude_ghibli_duo_original.jpg
 │   └── reze_denji_original.jpg
 ├── desktop_overlay.py          # Native Linux GTK3/WebKit2 transparent overlay
 ├── public/                     # Static assets, transparent PNGs, audio
-│   ├── gojo_satoru.png
-│   ├── sukuna.png
-│   ├── yuji_itadori.png
-│   ├── yuta_okkotsu.png
-│   ├── reze_denji.png
+│   ├── ayanokoji_512.png
+│   ├── gojo_satoru_512.png
+│   ├── sukuna_512.png
+│   ├── yuji_itadori_512.png
+│   ├── reze_denji_512.png
+│   ├── gagan_kundana_512.png
 │   ├── in_the_pool.mp3
 │   └── custom_track_meta.json
 ├── src/
@@ -218,6 +227,7 @@ All anime characters, character likenesses, names, and original musical composit
 - **Demon Slayer (Kimetsu no Yaiba)**, **Tanjiro Kamado**, **Nezuko Kamado**, **Zenitsu Agatsuma**, and **Inosuke Hashibira**: © **Koyoharu Gotouge / Shueisha, Aniplex, ufotable**
 - **Haikyuu!!**, **Shoyo Hinata**, and **Tobio Kageyama**: © **Haruichi Furudate / Shueisha, "Haikyu!!" Project, Production I.G**
 - **Jujutsu Kaisen**, **Gojo Satoru**, **Ryomen Sukuna**, **Yuji Itadori**, **Yuta Okkotsu**, **Megumi Fushiguro**, and **Nobara Kugisaki**: © **Gege Akutami / Shueisha, MAPPA**
+- **Classroom of the Elite (Youkoso Jitsuryoku Shijou Shugi no Kyoushitsu e)** and **Kiyotaka Ayanokoji**: © **Shougo Kinugasa, Tomoseshunsaku / KADOKAWA, Classroom of the Elite Production Committee, Lerche**
 - **Dude (2025)**, **Gagan**, and **Kundana**: Directed by **Keerthiswaran**, featuring character likenesses inspired by **Pradeep Ranganathan** and **Mamitha Baiju**
 - **Original Soundtrack ("in the pool")**: Composed by **Kensuke Ushio (牛尾憲輔)**, © **Sony Music Entertainment (Japan) Inc. / MAPPA**
 
