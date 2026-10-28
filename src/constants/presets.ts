@@ -48,20 +48,20 @@ export const DEFAULT_CHARACTERS: CharacterConfig[] = [
   {
     id: 'gagan_kundana',
     name: 'Gagan & Kundana (Dude)',
-    personality: 'Gagan and Kundana from the rom-com blockbuster Dude (2025) — chaotic best friends, event planners, and loving cousins bound together on your desktop.',
+    personality: 'Gagan and Kundana from the blockbuster Dude (2025) reimagined in classic Studio Ghibli watercolor anime style — floating together in nostalgic romance on your desktop.',
     hairStyle: 'curly',
-    hairColor: '#1c1917',
-    hairHighlight: '#44403c',
+    hairColor: '#292524',
+    hairHighlight: '#57534e',
     eyeStyle: 'anime_round',
-    eyeColor: '#78350f',
+    eyeColor: '#451a03',
     skinTone: '#fff1f2',
-    hoodieColor: '#ea580c', // Orange & black streetwear jacket for Gagan
-    hoodieAccent: '#f43f5e', // Pink floral kurti for Kundana
+    hoodieColor: '#1d4ed8', // Classic Ghibli denim jacket for Gagan
+    hoodieAccent: '#c084fc', // Pastel lavender jacket for Kundana
     hoodiePocket: true,
     accessories: ['ribbon'],
-    accessoryColor: '#f43f5e',
+    accessoryColor: '#dc2626',
     threadType: 'crimson_silk',
-    threadColor: '#f43f5e',
+    threadColor: '#dc2626',
     threadLength: 175,
     scale: 1.05,
     currentExpression: 'happy',

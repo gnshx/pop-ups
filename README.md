@@ -23,7 +23,7 @@ Features **native click-through pass-through** (using X11 shape masking) so you 
 | **Reze & Denji** (*Chainsaw Man*) | **Eren & Mikasa** (*Attack on Titan*) | **Gagan & Kundana** (*Dude*) |
 |:---:|:---:|:---:|
 | <img src="public/reze_denji_512.png" width="200" alt="Reze and Denji Desktop Pet" /> | <img src="public/eren_mikasa_512.png" width="200" alt="Eren and Mikasa Desktop Pet" /> | <img src="public/gagan_kundana_512.png" width="200" alt="Gagan and Kundana Desktop Pet" /> |
-| *Crimson Thread & "In the pool" OST* | *Red Scarf of Fate & Scout Cloak* | *DUDE 2025 Streetwear & Kurti* |
+| *Crimson Thread & "In the pool" OST* | *Red Scarf of Fate & Scout Cloak* | *Studio Ghibli Edition • Nostalgic Romance* |
 
 ### ⚔️ Demon Slayer (*Kimetsu no Yaiba*)
 | **Tanjiro Kamado** | **Nezuko Kamado** | **Zenitsu Agatsuma** | **Inosuke Hashibira** |
