@@ -342,15 +342,21 @@ export const CompanionSettingsPopup: React.FC<CompanionSettingsPopupProps> = ({
       <div className="popup-characters-section">
         <span className="section-label">Quick Switch:</span>
         <div className="character-pills-row">
-          {DEFAULT_CHARACTERS.map((char) => (
-            <button
-              key={char.id}
-              className={`char-quick-pill ${character.id === char.id ? 'pill-active' : ''}`}
-              onClick={() => onSelectCharacter(char)}
-            >
-              {char.name.split(' ')[0]}
-            </button>
-          ))}
+          {DEFAULT_CHARACTERS.map((char) => {
+            const label = char.name.includes('&')
+              ? char.name.split('(')[0].trim()
+              : char.name.split(' ')[0];
+            return (
+              <button
+                key={char.id}
+                className={`char-quick-pill ${character.id === char.id ? 'pill-active' : ''}`}
+                onClick={() => onSelectCharacter(char)}
+                title={char.name}
+              >
+                {label}
+              </button>
+            );
+          })}
         </div>
       </div>
 

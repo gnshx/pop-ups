@@ -316,8 +316,11 @@ export const PetCanvas: React.FC<PetCanvasProps> = ({
         const h = 180 * breathScale;
         ctx.drawImage(img, -w / 2, -22 + beatBob, w, h);
 
-        // Blushing & love glow for Reze & Denji
-        if (character.id === 'reze_denji' && (currentExpression === 'happy' || isDancing || isHovered)) {
+        // Blushing & love glow for romantic duos (Reze & Denji, Eren & Mikasa, Gagan & Kundana)
+        if (
+          (character.id === 'reze_denji' || character.id === 'eren_mikasa' || character.id === 'gagan_kundana') &&
+          (currentExpression === 'happy' || isDancing || isHovered)
+        ) {
           ctx.fillStyle = 'rgba(251, 113, 133, 0.35)';
           ctx.beginPath();
           ctx.ellipse(-26, 42 + beatBob, 10, 6, 0, 0, Math.PI * 2);

@@ -46,6 +46,28 @@ export const DEFAULT_CHARACTERS: CharacterConfig[] = [
     imageUrl: '/eren_mikasa.png',
   },
   {
+    id: 'gagan_kundana',
+    name: 'Gagan & Kundana (Dude)',
+    personality: 'Gagan and Kundana from the rom-com blockbuster Dude (2025) — chaotic best friends, event planners, and loving cousins bound together on your desktop.',
+    hairStyle: 'curly',
+    hairColor: '#1c1917',
+    hairHighlight: '#44403c',
+    eyeStyle: 'anime_round',
+    eyeColor: '#78350f',
+    skinTone: '#fff1f2',
+    hoodieColor: '#ea580c', // Orange & black streetwear jacket for Gagan
+    hoodieAccent: '#f43f5e', // Pink floral kurti for Kundana
+    hoodiePocket: true,
+    accessories: ['ribbon'],
+    accessoryColor: '#f43f5e',
+    threadType: 'crimson_silk',
+    threadColor: '#f43f5e',
+    threadLength: 175,
+    scale: 1.05,
+    currentExpression: 'happy',
+    imageUrl: '/gagan_kundana_512.png',
+  },
+  {
     id: 'gojo_satoru',
     name: 'Gojo Satoru (Jujutsu Kaisen)',
     personality: 'The strongest sorcerer with Six Eyes and Domain Expansion, chilling as your desktop companion.',

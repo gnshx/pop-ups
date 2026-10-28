@@ -19,11 +19,11 @@ Features **native click-through pass-through** (using X11 shape masking) so you 
 
 ## 📸 Companions & Artwork
 
-### 🌸 Romantic Anime Duos
-| **Reze & Denji** (*Chainsaw Man*) | **Eren & Mikasa** (*Attack on Titan*) |
-|:---:|:---:|
-| <img src="public/reze_denji_512.png" width="230" alt="Reze and Denji Desktop Pet" /> | <img src="public/eren_mikasa_512.png" width="230" alt="Eren and Mikasa Desktop Pet" /> |
-| *Crimson Thread & "In the pool" OST* | *Red Scarf of Fate & Scout Cloak* |
+### 🌸 Romantic Anime & Cinema Duos
+| **Reze & Denji** (*Chainsaw Man*) | **Eren & Mikasa** (*Attack on Titan*) | **Gagan & Kundana** (*Dude*) |
+|:---:|:---:|:---:|
+| <img src="public/reze_denji_512.png" width="200" alt="Reze and Denji Desktop Pet" /> | <img src="public/eren_mikasa_512.png" width="200" alt="Eren and Mikasa Desktop Pet" /> | <img src="public/gagan_kundana_512.png" width="200" alt="Gagan and Kundana Desktop Pet" /> |
+| *Crimson Thread & "In the pool" OST* | *Red Scarf of Fate & Scout Cloak* | *DUDE 2025 Streetwear & Kurti* |
 
 ### ⚔️ Demon Slayer (*Kimetsu no Yaiba*)
 | **Tanjiro Kamado** | **Nezuko Kamado** | **Zenitsu Agatsuma** | **Inosuke Hashibira** |
@@ -218,6 +218,7 @@ All anime characters, character likenesses, names, and original musical composit
 - **Demon Slayer (Kimetsu no Yaiba)**, **Tanjiro Kamado**, **Nezuko Kamado**, **Zenitsu Agatsuma**, and **Inosuke Hashibira**: © **Koyoharu Gotouge / Shueisha, Aniplex, ufotable**
 - **Haikyuu!!**, **Shoyo Hinata**, and **Tobio Kageyama**: © **Haruichi Furudate / Shueisha, "Haikyu!!" Project, Production I.G**
 - **Jujutsu Kaisen**, **Gojo Satoru**, **Ryomen Sukuna**, **Yuji Itadori**, **Yuta Okkotsu**, **Megumi Fushiguro**, and **Nobara Kugisaki**: © **Gege Akutami / Shueisha, MAPPA**
+- **Dude (2025)**, **Gagan**, and **Kundana**: Directed by **Keerthiswaran**, featuring character likenesses inspired by **Pradeep Ranganathan** and **Mamitha Baiju**
 - **Original Soundtrack ("in the pool")**: Composed by **Kensuke Ushio (牛尾憲輔)**, © **Sony Music Entertainment (Japan) Inc. / MAPPA**
 
 ### 2. Fair Use & Non-Commercial Statement
