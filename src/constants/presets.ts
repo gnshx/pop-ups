@@ -68,6 +68,72 @@ export const DEFAULT_CHARACTERS: CharacterConfig[] = [
     imageUrl: '/gagan_kundana_512.png',
   },
   {
+    id: 'jinwoo_haein',
+    name: 'Jinwoo & Hae-in (Solo Leveling)',
+    personality: 'The Shadow Monarch Sung Jin-woo and S-Rank Sword Dancer Cha Hae-in floating side-by-side as an iconic anime hunter couple.',
+    hairStyle: 'short',
+    hairColor: '#0f172a',
+    hairHighlight: '#38bdf8',
+    eyeStyle: 'sparkle',
+    eyeColor: '#06b6d4',
+    skinTone: '#fff1f2',
+    hoodieColor: '#09090b',
+    hoodieAccent: '#eab308',
+    hoodiePocket: false,
+    accessories: ['none'],
+    accessoryColor: '#8b5cf6',
+    threadType: 'twilight_purple',
+    threadColor: '#8b5cf6',
+    threadLength: 175,
+    scale: 1.05,
+    currentExpression: 'happy',
+    imageUrl: '/jinwoo_haein_512.png',
+  },
+  {
+    id: 'sung_jinwoo',
+    name: 'Sung Jin-woo (Solo Leveling)',
+    personality: 'The legendary Shadow Monarch who commands the shadow army, wielding glowing daggers with electric cyan eyes and dark monarch aura.',
+    hairStyle: 'short',
+    hairColor: '#09090b', // Midnight black
+    hairHighlight: '#0284c7', // Cyan shadow aura
+    eyeStyle: 'sparkle',
+    eyeColor: '#00f0ff', // Piercing neon cyan blue
+    skinTone: '#fff1f2',
+    hoodieColor: '#09090b', // Dark monarch trench coat
+    hoodieAccent: '#06b6d4', // Cyan magic glow
+    hoodiePocket: false,
+    accessories: ['none'],
+    accessoryColor: '#8b5cf6',
+    threadType: 'neon_cyan',
+    threadColor: '#00f0ff',
+    threadLength: 175,
+    scale: 1.05,
+    currentExpression: 'happy',
+    imageUrl: '/sung_jinwoo_512.png',
+  },
+  {
+    id: 'cha_haein',
+    name: 'Cha Hae-in (Solo Leveling - The Dancer)',
+    personality: 'The radiant S-Rank Vice-Guild Master of the Hunters Guild, renowned for her mesmerizing and lethal "Sword Dance" technique.',
+    hairStyle: 'bob',
+    hairColor: '#fde047', // Golden blonde bob
+    hairHighlight: '#fef08a',
+    eyeStyle: 'anime_round',
+    eyeColor: '#d97706', // Warm amber hazel
+    skinTone: '#fff1f2',
+    hoodieColor: '#475569', // Hunters Guild uniform blazer
+    hoodieAccent: '#eab308', // Gold trim & armor pauldrons
+    hoodiePocket: false,
+    accessories: ['none'],
+    accessoryColor: '#eab308',
+    threadType: 'golden_wire',
+    threadColor: '#eab308',
+    threadLength: 175,
+    scale: 1.05,
+    currentExpression: 'happy',
+    imageUrl: '/cha_haein_512.png',
+  },
+  {
     id: 'ayanokoji_kiyotaka',
     name: 'Ayanokoji Kiyotaka (Classroom of the Elite)',
     personality: 'The calm, enigmatic mastermind from the White Room who views everything as a game of chess, casually floating with his King piece.',

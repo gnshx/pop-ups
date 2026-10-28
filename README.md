@@ -20,10 +20,16 @@ Features **native click-through pass-through** (using X11 shape masking) so you 
 ## 📸 Companions & Artwork
 
 ### 🌸 Romantic Anime & Cinema Duos
-| **Reze & Denji** (*Chainsaw Man*) | **Eren & Mikasa** (*Attack on Titan*) | **Gagan & Kundana** (*Dude*) |
-|:---:|:---:|:---:|
-| <img src="public/reze_denji_512.png" width="200" alt="Reze and Denji Desktop Pet" /> | <img src="public/eren_mikasa_512.png" width="200" alt="Eren and Mikasa Desktop Pet" /> | <img src="public/gagan_kundana_512.png" width="200" alt="Gagan and Kundana Desktop Pet" /> |
-| *Crimson Thread & "In the pool" OST* | *Red Scarf of Fate & Scout Cloak* | *Studio Ghibli Edition • Nostalgic Romance* |
+| **Reze & Denji** (*Chainsaw Man*) | **Eren & Mikasa** (*Attack on Titan*) | **Jinwoo & Hae-in** (*Solo Leveling*) | **Gagan & Kundana** (*Dude*) |
+|:---:|:---:|:---:|:---:|
+| <img src="public/reze_denji_512.png" width="180" alt="Reze and Denji Desktop Pet" /> | <img src="public/eren_mikasa_512.png" width="180" alt="Eren and Mikasa Desktop Pet" /> | <img src="public/jinwoo_haein_512.png" width="180" alt="Jinwoo and Hae-in Desktop Pet" /> | <img src="public/gagan_kundana_512.png" width="180" alt="Gagan and Kundana Desktop Pet" /> |
+| *Crimson Thread & "In the pool" OST* | *Red Scarf of Fate & Scout Cloak* | *Shadow Monarch & Sword Dancer Duo* | *Studio Ghibli Edition • Nostalgic Romance* |
+
+### 🗡️ Solo Leveling (*Ore dake Level Up na Ken*)
+| **Sung Jin-woo** (*The Shadow Monarch*) | **Cha Hae-in** (*"The Dancer" / Sword Dancer*) |
+|:---:|:---:|
+| <img src="public/sung_jinwoo_512.png" width="190" alt="Sung Jin-woo" /> | <img src="public/cha_haein_512.png" width="190" alt="Cha Hae-in" /> |
+| *Shadow Monarch • Dual Glowing Daggers • Electric Cyan Aura* | *S-Rank Vice-Guild Master • Signature Sword Dance • Golden Ribbons* |
 
 ### ⚔️ Demon Slayer (*Kimetsu no Yaiba*)
 | **Tanjiro Kamado** | **Nezuko Kamado** | **Zenitsu Agatsuma** | **Inosuke Hashibira** |
@@ -180,6 +186,9 @@ Open `http://localhost:5173` in any web browser.
 ```
 pop-ups/
 ├── art/                        # Original generated artwork
+│   ├── sung_jinwoo_original.jpg
+│   ├── cha_haein_original.jpg
+│   ├── jinwoo_haein_original.jpg
 │   ├── ayanokoji_original.jpg
 │   ├── gojo_satoru_original.jpg
 │   ├── sukuna_original.jpg
@@ -189,6 +198,9 @@ pop-ups/
 │   └── reze_denji_original.jpg
 ├── desktop_overlay.py          # Native Linux GTK3/WebKit2 transparent overlay
 ├── public/                     # Static assets, transparent PNGs, audio
+│   ├── sung_jinwoo_512.png
+│   ├── cha_haein_512.png
+│   ├── jinwoo_haein_512.png
 │   ├── ayanokoji_512.png
 │   ├── gojo_satoru_512.png
 │   ├── sukuna_512.png
@@ -222,6 +234,7 @@ This software is an independent, non-commercial, open-source fan project created
 
 ### 1. Intellectual Property & Character Attribution
 All anime characters, character likenesses, names, and original musical compositions referenced or depicted in this repository are the sole intellectual property and copyrighted trademarks of their respective creators, publishers, and production studios:
+- **Solo Leveling (Ore dake Level Up na Ken)**, **Sung Jin-woo**, and **Cha Hae-in ("The Dancer")**: © **Chugong, DUBU (REDICE STUDIO), h-goon / D&C Media, Solo Leveling Animation Partners, A-1 Pictures**
 - **Chainsaw Man**, **Denji**, and **Reze**: © **Tatsuki Fujimoto / Shueisha, MAPPA**
 - **Attack on Titan (Shingeki no Kyojin)**, **Eren Yeager**, and **Mikasa Ackerman**: © **Hajime Isayama / Kodansha, Wit Studio, MAPPA**
 - **Demon Slayer (Kimetsu no Yaiba)**, **Tanjiro Kamado**, **Nezuko Kamado**, **Zenitsu Agatsuma**, and **Inosuke Hashibira**: © **Koyoharu Gotouge / Shueisha, Aniplex, ufotable**

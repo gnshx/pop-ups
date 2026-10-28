@@ -345,6 +345,10 @@ export const CompanionSettingsPopup: React.FC<CompanionSettingsPopupProps> = ({
           {DEFAULT_CHARACTERS.map((char) => {
             const label = char.name.includes('&')
               ? char.name.split('(')[0].trim()
+              : char.id === 'sung_jinwoo'
+              ? 'Jinwoo'
+              : char.id === 'cha_haein'
+              ? 'Hae-in'
               : char.name.split(' ')[0];
             return (
               <button
